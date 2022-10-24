@@ -1,6 +1,6 @@
 <?
 /**
-* CONTROLADORIA GERAL DA UNIÃO
+* CONTROLADORIA GERAL DA UNIï¿½O
 *
 * 25/06/2015 - criado por Rafael Leandro Ferreira
 *
@@ -8,7 +8,7 @@
 
 require_once dirname(__FILE__) . '/../../../../SEI.php';
 
-class CguRN extends InfraRN {
+class SeiComplementarRN extends InfraRN {
 
   public function __construct(){
     parent::__construct();
@@ -73,7 +73,7 @@ class CguRN extends InfraRN {
                 && $objDocumentoDTO->getStrNumero()==''
                 && $objDocumentoDTO->getNumIdSerie()=='') {
 
-                $objInfraException->lancarValidacao('É necessário informar ao menos um dos parâmetros da pesquisa.');
+                $objInfraException->lancarValidacao('ï¿½ necessï¿½rio informar ao menos um dos parï¿½metros da pesquisa.');
 
             }
 
@@ -116,7 +116,7 @@ class CguRN extends InfraRN {
     	$arrDto = $objDocumentoRN->listarRN0008($dto);
 
     	if ($arrDto==null){
-    		$objInfraException->lancarValidacao('Nenhum documento encontrado com os parâmetros informados.');
+    		$objInfraException->lancarValidacao('Nenhum documento encontrado com os parï¿½metros informados.');
       }
         
       $i = 0;
@@ -137,7 +137,7 @@ class CguRN extends InfraRN {
 
               $objProtocoloRN = new ProtocoloRN();
               if (count($objProtocoloRN->pesquisarRN0967($objPesquisaProtocoloDTO)) == 0) {
-                  $objInfraException->lancarValidacao('Unidade [' . $objUnidadeDTO->getStrSigla() . '] não possui acesso ao documento [' . $objDocumentoDTO->getStrProtocoloDocumentoFormatado() . '].');
+                  $objInfraException->lancarValidacao('Unidade [' . $objUnidadeDTO->getStrSigla() . '] nï¿½o possui acesso ao documento [' . $objDocumentoDTO->getStrProtocoloDocumentoFormatado() . '].');
               }
           }*/
 
@@ -171,7 +171,7 @@ class CguRN extends InfraRN {
 
           $objInfraException->lancarValidacoes();
 
-          //verifica se o usuário já tem acesso ao processo
+          //verifica se o usuï¿½rio jï¿½ tem acesso ao processo
           $objAcessoExternoDTO = new AcessoExternoDTO();
           $objAcessoExternoDTO->retNumIdAcessoExterno();
           $objAcessoExternoDTO->setDblIdProtocoloAtividade($objDocumentoDTO->getDblIdProcedimento());
@@ -201,7 +201,7 @@ class CguRN extends InfraRN {
               $objAcessoExternoDTO = $objAcessoExternoRN->cadastrar($objAcessoExternoDTO);
           }
 
-          $arrObjWSRetornoConsultarDocumentoDTO[$i] = new WSCguRetornoConsultarDocumentoDTO();
+          $arrObjWSRetornoConsultarDocumentoDTO[$i] = new WSSeiComplementarRetornoConsultarDocumentoDTO();
           $arrObjWSRetornoConsultarDocumentoDTO[$i]->setDblIdProcedimento($objDocumentoDTO->getDblIdProcedimento());
           $arrObjWSRetornoConsultarDocumentoDTO[$i]->setStrProcedimentoFormatado($objDocumentoDTO->getStrProtocoloProcedimentoFormatado());
           $arrObjWSRetornoConsultarDocumentoDTO[$i]->setDblIdDocumento($objDocumentoDTO->getDblIdDocumento());
@@ -401,7 +401,7 @@ class CguRN extends InfraRN {
             $arrDto = $objProcedimentoRN->listarRN0278($dto);
 
             if ($arrDto==null){
-                $objInfraException->lancarValidacao('Nenhum processo encontrado para os parâmetros informados.');
+                $objInfraException->lancarValidacao('Nenhum processo encontrado para os parï¿½metros informados.');
             }
 
             $i = 0;
@@ -418,7 +418,7 @@ class CguRN extends InfraRN {
 
                     $objProtocoloRN = new ProtocoloRN();
                     if (count($objProtocoloRN->pesquisarRN0967($objPesquisaProtocoloDTO)) == 0) {
-                        $objInfraException->lancarValidacao('Unidade [' . $objUnidadeDTO->getStrSigla() . '] não possui acesso ao processo [' . $objProcedimentoDTO->getStrProtocoloProcedimentoFormatado() . '].');
+                        $objInfraException->lancarValidacao('Unidade [' . $objUnidadeDTO->getStrSigla() . '] nï¿½o possui acesso ao processo [' . $objProcedimentoDTO->getStrProtocoloProcedimentoFormatado() . '].');
                     }
                 }
 
@@ -446,7 +446,7 @@ class CguRN extends InfraRN {
 
                 $objInfraException->lancarValidacoes();
 
-                //verifica se o usuário já tem acesso ao processo
+                //verifica se o usuï¿½rio jï¿½ tem acesso ao processo
                 $objAcessoExternoDTO = new AcessoExternoDTO();
                 $objAcessoExternoDTO->retNumIdAcessoExterno();
                 $objAcessoExternoDTO->setDblIdProtocoloAtividade($objProcedimentoDTO->getDblIdProcedimento());
@@ -520,12 +520,12 @@ class CguRN extends InfraRN {
             $dto = $objProcedimentoRN->consultarRN0201($dto);
 
             if ($dto==null){
-                $objInfraException->lancarValidacao('Processo '.$objProcedimentoDTO->getStrProtocoloProcedimentoFormatado().' não encontrado.');
+                $objInfraException->lancarValidacao('Processo '.$objProcedimentoDTO->getStrProtocoloProcedimentoFormatado().' nï¿½o encontrado.');
             }
 
             $objProcedimentoDTO = $dto;
 
-            $objWSRetornoListarAndamentosDTO = new WSCguRetornoListarAndamentosDTO();
+            $objWSRetornoListarAndamentosDTO = new WSSeiComplementarRetornoListarAndamentosDTO();
 
             $objWSRetornoListarAndamentosDTO->setDblIdProcedimento($objProcedimentoDTO->getDblIdProcedimento());
             $objWSRetornoListarAndamentosDTO->setStrProcedimentoFormatado($objProcedimentoDTO->getStrProtocoloProcedimentoFormatado());
@@ -572,12 +572,12 @@ class CguRN extends InfraRN {
             $dto = $objProcedimentoRN->consultarRN0201($dto);
 
             if ($dto==null){
-                $objInfraException->lancarValidacao('Processo '.$objProcedimentoDTO->getStrProtocoloProcedimentoFormatado().' não encontrado.');
+                $objInfraException->lancarValidacao('Processo '.$objProcedimentoDTO->getStrProtocoloProcedimentoFormatado().' nï¿½o encontrado.');
             }
 
             $objProcedimentoDTO = $dto;*/
 
-            $objWSRetornoListarAndamentosDTO = new WSCguRetornoListarAndamentosDTO();
+            $objWSRetornoListarAndamentosDTO = new WSSeiComplementarRetornoListarAndamentosDTO();
 
             /*$objWSRetornoListarAndamentosDTO->setDblIdProcedimento($objProcedimentoDTO->getDblIdProcedimento());
             $objWSRetornoListarAndamentosDTO->setStrProcedimentoFormatado($objProcedimentoDTO->getStrProtocoloProcedimentoFormatado());
@@ -614,7 +614,7 @@ class CguRN extends InfraRN {
       //filtra somente processos
       $objParticipanteDTO->setStrStaProtocoloProtocolo(ProtocoloRN::$TP_PROCEDIMENTO);
 
-      //como não tem paginação é bom limitar
+      //como nï¿½o tem paginaï¿½ï¿½o ï¿½ bom limitar
       $objParticipanteDTO->setNumMaxRegistrosRetorno(500);
 
       $objParticipanteRN = new ParticipanteRN();
@@ -640,14 +640,14 @@ class CguRN extends InfraRN {
         $objRelProtocoloAssuntoDTO->retNumIdAssunto();
         $objRelProtocoloAssuntoDTO->setStrCodigoEstruturadoAssunto($ClassificacaoAssunto);
 
-        //como não tem paginação é bom limitar
+        //como nï¿½o tem paginaï¿½ï¿½o ï¿½ bom limitar
         $objRelProtocoloAssuntoDTO->setNumMaxRegistrosRetorno(500);
 
         $objRelProtocoloAssuntoRN = new RelProtocoloAssuntoRN();
         $arrAssuntos = $objRelProtocoloAssuntoRN->listarRN0188($objRelProtocoloAssuntoDTO);
 
         if (count($arrAssuntos)==0){
-            throw new InfraException('Nenhuma Classificação de Assunto encontrado!'); }
+            throw new InfraException('Nenhuma Classificaï¿½ï¿½o de Assunto encontrado!'); }
 
         $ret = array();
         foreach($arrAssuntos as $Assuntos){
@@ -670,7 +670,7 @@ class CguRN extends InfraRN {
       $arrObjPendenciaDTO = $objAtividadeRN->listarPendenciasRN0754($objPesquisaPendenciaDTO);
 
       if (count($arrObjPendenciaDTO)==0){
-          throw new InfraException('Nenhum Procedimento com Pendência para a Unidade Informada!'); }
+          throw new InfraException('Nenhum Procedimento com Pendï¿½ncia para a Unidade Informada!'); }
 
       $ret = array();
 
@@ -735,28 +735,28 @@ class CguRN extends InfraRN {
 
   private function adicionarCriteriosProcessoDocumento(OperacaoServicoDTO $objOperacaoServicoDTO, ProcedimentoDTO $objProcedimentoDTO, DocumentoDTO $objDocumentoDTO){
   
-    //qualquer série em qualquer tipo de procedimento
+    //qualquer sï¿½rie em qualquer tipo de procedimento
     $objOperacaoServicoDTO->adicionarCriterio(array('IdSerie','IdTipoProcedimento'),
         array(InfraDTO::$OPER_IGUAL,InfraDTO::$OPER_IGUAL),
         array(null,null),
         array(InfraDTO::$OPER_LOGICO_AND),
         'c1');
   
-    //esta série em qualquer tipo de procedimento
+    //esta sï¿½rie em qualquer tipo de procedimento
     $objOperacaoServicoDTO->adicionarCriterio(array('IdSerie','IdTipoProcedimento'),
         array(InfraDTO::$OPER_IGUAL,InfraDTO::$OPER_IGUAL),
         array($objDocumentoDTO->getNumIdSerie(),null),
         array(InfraDTO::$OPER_LOGICO_AND),
         'c2');
   
-    //qualquer série neste tipo de procedimento
+    //qualquer sï¿½rie neste tipo de procedimento
     $objOperacaoServicoDTO->adicionarCriterio(array('IdSerie','IdTipoProcedimento'),
         array(InfraDTO::$OPER_IGUAL,InfraDTO::$OPER_IGUAL),
         array(null, $objProcedimentoDTO->getNumIdTipoProcedimento()),
         array(InfraDTO::$OPER_LOGICO_AND),
         'c3');
   
-    //esta série neste tipo de procedimento
+    //esta sï¿½rie neste tipo de procedimento
     $objOperacaoServicoDTO->adicionarCriterio(array('IdSerie','IdTipoProcedimento'),
         array(InfraDTO::$OPER_IGUAL,InfraDTO::$OPER_IGUAL),
         array($objDocumentoDTO->getNumIdSerie(), $objProcedimentoDTO->getNumIdTipoProcedimento()),
@@ -771,56 +771,56 @@ class CguRN extends InfraRN {
 
   private function adicionarCriteriosUnidadeProcessoDocumento(OperacaoServicoDTO $objOperacaoServicoDTO, UnidadeDTO $objUnidadeDTO, ProcedimentoDTO $objProcedimentoDTO, DocumentoDTO $objDocumentoDTO){
 
-    //qualquer série em qualquer unidade em qualquer tipo de procedimento
+    //qualquer sï¿½rie em qualquer unidade em qualquer tipo de procedimento
     $objOperacaoServicoDTO->adicionarCriterio(array('IdSerie','IdUnidade','IdTipoProcedimento'),
         array(InfraDTO::$OPER_IGUAL,InfraDTO::$OPER_IGUAL,InfraDTO::$OPER_IGUAL),
         array(null,null,null),
         array(InfraDTO::$OPER_LOGICO_AND,InfraDTO::$OPER_LOGICO_AND),
         'c1');
     
-    //esta série em qualquer unidade em qualquer tipo de procedimento
+    //esta sï¿½rie em qualquer unidade em qualquer tipo de procedimento
     $objOperacaoServicoDTO->adicionarCriterio(array('IdSerie','IdUnidade','IdTipoProcedimento'),
         array(InfraDTO::$OPER_IGUAL,InfraDTO::$OPER_IGUAL,InfraDTO::$OPER_IGUAL),
         array($objDocumentoDTO->getNumIdSerie(),null,null),
         array(InfraDTO::$OPER_LOGICO_AND,InfraDTO::$OPER_LOGICO_AND),
         'c2');
     
-    //qualquer série nesta unidade em qualquer tipo de procedimento
+    //qualquer sï¿½rie nesta unidade em qualquer tipo de procedimento
     $objOperacaoServicoDTO->adicionarCriterio(array('IdSerie','IdUnidade','IdTipoProcedimento'),
         array(InfraDTO::$OPER_IGUAL,InfraDTO::$OPER_IGUAL,InfraDTO::$OPER_IGUAL),
         array(null, $objUnidadeDTO->getNumIdUnidade(),null),
         array(InfraDTO::$OPER_LOGICO_AND,InfraDTO::$OPER_LOGICO_AND),
         'c3');
     
-    //qualquer série em qualquer unidade neste tipo de procedimento
+    //qualquer sï¿½rie em qualquer unidade neste tipo de procedimento
     $objOperacaoServicoDTO->adicionarCriterio(array('IdSerie','IdUnidade','IdTipoProcedimento'),
         array(InfraDTO::$OPER_IGUAL,InfraDTO::$OPER_IGUAL,InfraDTO::$OPER_IGUAL),
         array(null, null ,$objProcedimentoDTO->getNumIdTipoProcedimento()),
         array(InfraDTO::$OPER_LOGICO_AND,InfraDTO::$OPER_LOGICO_AND),
         'c4');
     
-    //esta série nesta unidade em qualquer tipo de procedimento
+    //esta sï¿½rie nesta unidade em qualquer tipo de procedimento
     $objOperacaoServicoDTO->adicionarCriterio(array('IdSerie','IdUnidade','IdTipoProcedimento'),
         array(InfraDTO::$OPER_IGUAL,InfraDTO::$OPER_IGUAL,InfraDTO::$OPER_IGUAL),
         array($objDocumentoDTO->getNumIdSerie(), $objUnidadeDTO->getNumIdUnidade(),null),
         array(InfraDTO::$OPER_LOGICO_AND,InfraDTO::$OPER_LOGICO_AND),
         'c5');
     
-    //esta série em qualquer unidade neste tipo de procedimento
+    //esta sï¿½rie em qualquer unidade neste tipo de procedimento
     $objOperacaoServicoDTO->adicionarCriterio(array('IdSerie','IdUnidade','IdTipoProcedimento'),
         array(InfraDTO::$OPER_IGUAL,InfraDTO::$OPER_IGUAL,InfraDTO::$OPER_IGUAL),
         array($objDocumentoDTO->getNumIdSerie(), null,$objProcedimentoDTO->getNumIdTipoProcedimento()),
         array(InfraDTO::$OPER_LOGICO_AND,InfraDTO::$OPER_LOGICO_AND),
         'c6');
     
-    //qualquer série nesta unidade neste tipo de procedimento
+    //qualquer sï¿½rie nesta unidade neste tipo de procedimento
     $objOperacaoServicoDTO->adicionarCriterio(array('IdSerie','IdUnidade','IdTipoProcedimento'),
         array(InfraDTO::$OPER_IGUAL,InfraDTO::$OPER_IGUAL,InfraDTO::$OPER_IGUAL),
         array(null, $objUnidadeDTO->getNumIdUnidade(),$objProcedimentoDTO->getNumIdTipoProcedimento()),
         array(InfraDTO::$OPER_LOGICO_AND,InfraDTO::$OPER_LOGICO_AND),
         'c7');
     
-    //esta série nesta unidade neste tipo de procedimento
+    //esta sï¿½rie nesta unidade neste tipo de procedimento
     $objOperacaoServicoDTO->adicionarCriterio(array('IdSerie','IdUnidade','IdTipoProcedimento'),
         array(InfraDTO::$OPER_IGUAL,InfraDTO::$OPER_IGUAL,InfraDTO::$OPER_IGUAL),
         array($objDocumentoDTO->getNumIdSerie(), $objUnidadeDTO->getNumIdUnidade(),$objProcedimentoDTO->getNumIdTipoProcedimento()),

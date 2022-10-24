@@ -14,7 +14,7 @@
 			'URL' => 'http://[Servidor_PHP]/sei',
 			'Producao' => false,
 			'RepositorioArquivos' => '/var/sei/arquivos',
-			'Modulos' => array('MdCguWsComplementarIntegracao' => 'cgu/md-ws-complementar',)
+			'Modulos' => array('MdSeiComplementarWsComplementarIntegracao' => 'ufsc/md-ws-complementar',)
 			),
 
 ## Documentação

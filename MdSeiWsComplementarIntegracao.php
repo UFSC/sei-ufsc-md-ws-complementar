@@ -6,7 +6,7 @@
  *
  */
 
-class MdCguWsComplementarIntegracao extends SeiIntegracao
+class MdSeiWsComplementarIntegracao extends SeiIntegracao
 {
 
 //    public function __construct()
@@ -15,24 +15,24 @@ class MdCguWsComplementarIntegracao extends SeiIntegracao
 
     public function getNome()
     {
-        return 'MÛdulo de Webservice de consultas complementar da CGU';
+        return 'MÛdulo de Webservice Complementar para consultas no SEI';
     }
 
     public function getVersao()
     {
-        return '2.0.0';
+        return '1.0.0';
     }
 
     public function getInstituicao()
     {
-        return 'CGU - Controladoria Geral da Uni„o';
+        return 'UFSC - Universidade Federal de Santa Catarina';
     }
 
 //    public function inicializar($strVersaoSEI)
 //    {
 //        /*
 //        if (substr($strVersaoSEI, 0, 2) != '3.'){
-//          die('MÛdulo "'.$this->getNome().'" ('.$this->getVersao().') n„o È compatÌvel com esta vers„o do SEI ('.$strVersaoSEI.').');
+//          die('MÛdulo "'.$this->getNome().'" ('.$this->getVersao().') n„o È compat√≠vel com esta vers„o do SEI ('.$strVersaoSEI.').');
 //        }
 //        */
 //    }
@@ -41,8 +41,8 @@ class MdCguWsComplementarIntegracao extends SeiIntegracao
     {
         $strArq = null;
         switch ($strServico) {
-            case 'cgu':
-                $strArq = 'cgu.wsdl';
+            case 'sei-complementar':
+                $strArq = 'sei-complementar.wsdl';
                 break;
         }
 

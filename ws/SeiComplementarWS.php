@@ -1,19 +1,19 @@
 <?
 /*
- * CONTROLADORIA GERAL DA UNIÃO - CGU
+ * CONTROLADORIA GERAL DA UNIï¿½O - CGU
  *
  * 23/06/2015 - criado por Rafael Leandro Ferreira
  *
  *
- *Este WebService tem o objetivo de atender a necessidade da CGU que não está suportada dentro dos métodos
+ *Este WebService tem o objetivo de atender a necessidade da CGU que nï¿½o estï¿½ suportada dentro dos mï¿½todos
  *existentes em SeiWS.php.
- *Foi criado este arquivo para não fazer alterações neste arquivo. O ideal é que posteriormente estes métodos sejam incorporados
- *ao SeiWS para estar disponível como um método homologado pelo SEI.
+ *Foi criado este arquivo para nï¿½o fazer alteraï¿½ï¿½es neste arquivo. O ideal ï¿½ que posteriormente estes mï¿½todos sejam incorporados
+ *ao SeiWS para estar disponï¿½vel como um mï¿½todo homologado pelo SEI.
  */
 
 require_once dirname(__FILE__) . '/../../../../SEI.php';
 
-class CguWS extends InfraWS {
+class SeiComplementarWS extends InfraWS {
 
     public function getObjInfraLog(){
         return LogSEI::getInstance();
@@ -111,8 +111,8 @@ class CguWS extends InfraWS {
                 $objWSEntradaListarDocumentoDTO->setStrSinRetornarDestinatarios('N');
             }
 
-            $objCguRN = new CguRN();
-            $objWSRetornoListarDocumentoDTO = $objCguRN->listarDocumento($objWSEntradaListarDocumentoDTO);
+            $objSeiComplementarRN = new SeiComplementarRN();
+            $objWSRetornoListarDocumentoDTO = $objSeiComplementarRN->listarDocumento($objWSEntradaListarDocumentoDTO);
 
             $i = 0;
             $ret = array();
@@ -307,8 +307,8 @@ class CguWS extends InfraWS {
                 $objWSEntradaListarProcedimentoDTO->setNumUnidadeProcedimentoAberto(null);
             }
 
-            $objCguRN = new CguRN();
-            $objWSRetornoListarProcedimentoDTO = $objCguRN->listarProcedimento($objWSEntradaListarProcedimentoDTO);
+            $objSeiComplementarRN = new SeiComplementarRN();
+            $objWSRetornoListarProcedimentoDTO = $objSeiComplementarRN->listarProcedimento($objWSEntradaListarProcedimentoDTO);
 
             $ret = array();
             $i = 0;
@@ -381,8 +381,8 @@ class CguWS extends InfraWS {
             $objWSEntradaListarAndamentosDTO->setObjProcedimentoDTO($objProcedimentoDTO);
             $objWSEntradaListarAndamentosDTO->setObjUnidadeDTO($objUnidadeDTO);
 
-            $objCguRN = new CguRN();
-            $objWSRetornoListarAndamentosDTO = $objCguRN->listarAndamentos($objWSEntradaListarAndamentosDTO);
+            $objSeiComplementarRN = new SeiComplementarRN();
+            $objWSRetornoListarAndamentosDTO = $objSeiComplementarRN->listarAndamentos($objWSEntradaListarAndamentosDTO);
 
             $ret = array();
             $i = 0;
@@ -480,8 +480,8 @@ class CguWS extends InfraWS {
                 $objWSEntradaListarProcedimentosTramitadosDTO->setDthDataReferencia($dataAbertura);
                 $objWSEntradaListarProcedimentosTramitadosDTO->setNumIdUnidadePesquisa($idUnidadePesquisa);
 
-                $objCguRN = new CguRN();
-                $objWSRetornoListarAndamentosDTO = $objCguRN->listarProcedimentosTramitadosParaArea($objWSEntradaListarProcedimentosTramitadosDTO);
+                $objSeiComplementarRN = new SeiComplementarRN();
+                $objWSRetornoListarAndamentosDTO = $objSeiComplementarRN->listarProcedimentosTramitadosParaArea($objWSEntradaListarProcedimentosTramitadosDTO);
 
                 $arrObjAtividadeDTO = $objWSRetornoListarAndamentosDTO->getArrObjAtividadeDTO();
 
@@ -518,7 +518,7 @@ class CguWS extends InfraWS {
         $objUsuarioDTO = $objUsuarioRN->consultarRN0489($objUsuarioDTO);
 
         if ($objUsuarioDTO==null){
-            throw new InfraException('Sistema ['.$SiglaSistema.'] não encontrado.');
+            throw new InfraException('Sistema ['.$SiglaSistema.'] nï¿½o encontrado.');
         }
 
         $objServicoDTO = new ServicoDTO();
@@ -536,7 +536,7 @@ class CguWS extends InfraWS {
         $objServicoDTO = $objServicoRN->consultar($objServicoDTO);
 
         if ($objServicoDTO==null){
-            throw new InfraException('Serviço ['.$IdentificacaoServico.'] do sistema ['.$SiglaSistema.'] não encontrado.');
+            throw new InfraException('Serviï¿½o ['.$IdentificacaoServico.'] do sistema ['.$SiglaSistema.'] nï¿½o encontrado.');
         }
 
         return $objServicoDTO;
@@ -560,7 +560,7 @@ class CguWS extends InfraWS {
         $objUnidadeDTO = $objUnidadeRN->consultarRN0125($objUnidadeDTO);
 
         if ($objUnidadeDTO==null){
-            throw new InfraException('Unidade ['.$IdUnidade.'] não encontrada.');
+            throw new InfraException('Unidade ['.$IdUnidade.'] nï¿½o encontrada.');
         }
 
         return $objUnidadeDTO;
@@ -571,18 +571,18 @@ class CguWS extends InfraWS {
  $servidorSoap = new SoapServer("sei.wsdl",array('encoding'=>'ISO-8859-1'));
  $servidorSoap->setClass("SeiWS");
 
- //Só processa se acessado via POST
+ //Sï¿½ processa se acessado via POST
  if ($_SERVER['REQUEST_METHOD']=='POST') {
  $servidorSoap->handle();
  }
 */
 
-$servidorSoap = new BeSimple\SoapServer\SoapServer( "cgu.wsdl", array ('encoding'=>'ISO-8859-1',
+$servidorSoap = new BeSimple\SoapServer\SoapServer( "sei-complementar.wsdl", array ('encoding'=>'ISO-8859-1',
     'soap_version' => SOAP_1_1,
     'attachment_type'=>BeSimple\SoapCommon\Helper::ATTACHMENTS_TYPE_MTOM));
-$servidorSoap->setClass ( "CguWS" );
+$servidorSoap->setClass ( "SeiComplementarWS" );
 
-//Só processa se acessado via POST
+//Sï¿½ processa se acessado via POST
 if ($_SERVER['REQUEST_METHOD']=='POST') {
     $servidorSoap->handle($HTTP_RAW_POST_DATA);
 }

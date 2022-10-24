@@ -1,6 +1,6 @@
 <?
 /**
-* TRIBUNAL REGIONAL FEDERAL DA 4ª REGIÃO
+* TRIBUNAL REGIONAL FEDERAL DA 4ï¿½ REGIï¿½O
 *
 * 13/10/2011 - criado por mga
 *
@@ -8,7 +8,7 @@
 
 require_once dirname(__FILE__).'/../../../../SEI.php';
 
-class WSCguRetornoConsultarDocumentoDTO extends InfraDTO {
+class WSSeiComplementarRetornoConsultarDocumentoDTO extends InfraDTO {
 
   public function getStrNomeTabela() {
   	 return null;
