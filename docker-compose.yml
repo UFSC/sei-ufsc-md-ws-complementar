@@ -1,0 +1,40 @@
+version: "3.1"
+services:
+  sei-app:
+    build: .
+    env_file:
+      - .env
+    restart: always
+    networks:
+      - default
+    ports:
+      - ${SEI_HTTP_PORT-8080}:80
+      - ${SEI_HTTPS_PORT-8443}:443
+    volumes:
+      - ./:/opt/sei/web/modulos/ufsc/wscomplementar
+      - sei-app-arquivos:/dados
+    environment:
+      SEI_ORGAO: "ABC"
+      SEI_HOST_URL: "localhost"
+      SEI_DB_USERNAME: "sei_user"
+      SEI_DB_PASSWORD: "sei_user"
+      SIP_DB_USERNAME: "sip_user"
+      SIP_DB_PASSWORD: "sip_user"
+    depends_on:
+      - sei-bd
+      - sei-memcached
+  sei-bd:
+    image: ${SEI_BD_DOCKER_IMAGE-sei-bd:3.1}
+    env_file:
+      - .env
+    restart: always
+    ports:
+      - "${DB_PORT:-3306}:3306"
+    volumes:
+      - sei-bd-storage:/var/lib/mysql
+  sei-memcached:
+    image: memcached
+    restart: always
+volumes:
+  sei-app-arquivos:
+  sei-bd-storage:

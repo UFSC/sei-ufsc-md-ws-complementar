@@ -1,0 +1,11 @@
+ARG SEI_APP_DOCKER_IMAGE=sei-app:3.1
+
+FROM $SEI_APP_DOCKER_IMAGE
+
+RUN sed  -i "/'RepositorioArquivos'/a ,'Modulos' => array('MdSeiWsComplementarIntegracao' => 'ufsc/wscomplementar')" /opt/sei/config/ConfiguracaoSEI.php && \
+    mkdir -p /opt/sei/web/modulos/ufsc/wscomplementar
+
+COPY *.php /opt/sei/web/modulos/ufsc/wscomplementar
+COPY dto /opt/sei/web/modulos/ufsc/wscomplementar/dto
+COPY rn /opt/sei/web/modulos/ufsc/wscomplementar/rn
+COPY ws /opt/sei/web/modulos/ufsc/wscomplementar/ws
