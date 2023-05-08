@@ -14,12 +14,16 @@ services:
       - ./:/opt/sei/web/modulos/ufsc/wscomplementar
       - sei-app-arquivos:/dados
     environment:
-      SEI_ORGAO: "ABC"
-      SEI_HOST_URL: "localhost"
-      SEI_DB_USERNAME: "sei_user"
-      SEI_DB_PASSWORD: "sei_user"
-      SIP_DB_USERNAME: "sip_user"
-      SIP_DB_PASSWORD: "sip_user"
+      SEI_ORGAO: "${SEI_ORGAO-ABC}"
+      SEI_HOST_URL: "localhost:${SEI_HTTPS_PORT-8443}"
+      SEI_DB_HOST: "${SEI_DB_HOST-sei-bd}"
+      SEI_DB_PORT: "${SEI_DB_PORT-3306}"
+      SEI_DB_USERNAME: "${SEI_DB_USERNAME-sei_user}"
+      SEI_DB_PASSWORD: "${SEI_DB_PASSWORD-sei_user}"
+      SIP_DB_HOST: "${SIP_DB_HOST-sei-bd}"
+      SIP_DB_PORT: "${SIP_DB_PORT-3306}"
+      SIP_DB_USERNAME: "${SIP_DB_USERNAME-sip_user}"
+      SIP_DB_PASSWORD: "${SIP_DB_PASSWORD-sip_user}"
     depends_on:
       - sei-bd
       - sei-memcached

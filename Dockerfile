@@ -1,4 +1,4 @@
-ARG SEI_APP_DOCKER_IMAGE=sei-app:3.1
+ARG SEI_APP_DOCKER_IMAGE=docker-repo.sistemas.ufsc.br/ufsc/sei-app-stock:3.1
 
 FROM $SEI_APP_DOCKER_IMAGE
 

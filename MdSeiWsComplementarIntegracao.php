@@ -1,8 +1,8 @@
 <?php
 /**
- * CONTROLADORIA GERAL DA UNIAO
+ * Universidade Federal de Santa Catarina
  *
- * 03/10/2017 - criado por rafael.ferreira@cgu.gov.br
+ * 05/05/2023 - criado por roque.bezerra@ufsc.br
  *
  */
 
@@ -15,7 +15,7 @@ class MdSeiWsComplementarIntegracao extends SeiIntegracao
 
     public function getNome()
     {
-        return 'Módulo de Webservice Complementar para consultas no SEI';
+        return 'Mï¿½dulo de Webservice Complementar para consultas no SEI';
     }
 
     public function getVersao()
@@ -32,7 +32,7 @@ class MdSeiWsComplementarIntegracao extends SeiIntegracao
 //    {
 //        /*
 //        if (substr($strVersaoSEI, 0, 2) != '3.'){
-//          die('Módulo "'.$this->getNome().'" ('.$this->getVersao().') não é compatÃ­vel com esta versão do SEI ('.$strVersaoSEI.').');
+//          die('Mï¿½dulo "'.$this->getNome().'" ('.$this->getVersao().') nï¿½o ï¿½ compatÃ­vel com esta versï¿½o do SEI ('.$strVersaoSEI.').');
 //        }
 //        */
 //    }
@@ -41,7 +41,7 @@ class MdSeiWsComplementarIntegracao extends SeiIntegracao
     {
         $strArq = null;
         switch ($strServico) {
-            case 'sei-complementar':
+            case 'ufsc-sei-complementar':
                 $strArq = 'sei-complementar.wsdl';
                 break;
         }
