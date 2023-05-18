@@ -11,7 +11,7 @@ package:
     - cp -R dto dist/ufsc/
     - cp -R ws dist/ufsc/
     - cd dist
-    - tar cvfz ufsc-sei-complementar.tar.gz .
+    - tar cvfz ufsc-sei-complementar.tar.gz ufsc
     - mv ufsc-sei-complementar.tar.gz ../
   artifacts:
     paths:
