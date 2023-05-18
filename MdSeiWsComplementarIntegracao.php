@@ -15,7 +15,7 @@ class MdSeiWsComplementarIntegracao extends SeiIntegracao
 
     public function getNome()
     {
-        return 'MÔøΩdulo de Webservice Complementar para consultas no SEI';
+        return 'MÛdulo de Webservice Complementar para integraÁ„o com o SEI';
     }
 
     public function getVersao()
@@ -32,7 +32,7 @@ class MdSeiWsComplementarIntegracao extends SeiIntegracao
 //    {
 //        /*
 //        if (substr($strVersaoSEI, 0, 2) != '3.'){
-//          die('MÔøΩdulo "'.$this->getNome().'" ('.$this->getVersao().') nÔøΩo ÔøΩ compat√≠vel com esta versÔøΩo do SEI ('.$strVersaoSEI.').');
+//          die('MÛdulo "'.$this->getNome().'" ('.$this->getVersao().') n„o È compat√≠vel com esta vers„o do SEI ('.$strVersaoSEI.').');
 //        }
 //        */
 //    }

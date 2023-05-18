@@ -261,6 +261,16 @@
       </xsd:complexContent>
     </xsd:complexType>
 
+    <xsd:complexType name="RetornoConsultaConteudoDocumento">
+      <xsd:all>
+        <xsd:element name="IdProcedimento" type="xsd:string"/>
+        <xsd:element name="ProcedimentoFormatado" type="xsd:string"/>
+        <xsd:element name="IdDocumento" type="xsd:string"/>
+        <xsd:element name="DocumentoFormatado" type="xsd:string"/>
+        <xsd:element name="MimeType" type="xsd:string"/>
+        <xsd:element name="Conteudo" type="xsd:string"/>
+      </xsd:all>
+    </xsd:complexType>
     </xsd:schema>
 
   </wsdl:types>
@@ -328,6 +338,18 @@
   <wsdl:message name="listarProcedimentosTramitadosParaAreaResponse">
     <wsdl:part name="parametros" type="tns:ArrayOfListaDeProcedimentos"/>
   </wsdl:message>
+  
+  <wsdl:message name="consultarConteudoDocumentoRequest">
+    <wsdl:part name="SiglaSistema" type="xsd:string"/>
+    <wsdl:part name="IdentificacaoServico" type="xsd:string"/>
+    <wsdl:part name="IdUnidade" type="xsd:string"/>
+    <wsdl:part name="IdDocumento" type="xsd:string"/>
+    <wsdl:part name="ProtocoloDocumento" type="xsd:string"/>
+  </wsdl:message>
+
+  <wsdl:message name="consultarConteudoDocumentoResponse">
+    <wsdl:part name="parametros" type="tns:RetornoConsultaConteudoDocumento"/>
+  </wsdl:message>
 
   <wsdl:portType name="SeiComplementarPortType">
     <wsdl:operation name="listarProcedimentos">
@@ -352,6 +374,12 @@
       <wsdl:documentation>Consulta de andamentos Tramitados para determinada Área</wsdl:documentation>
       <wsdl:input message="tns:listarProcedimentosTramitadosParaAreaRequest"/>
       <wsdl:output message="tns:listarProcedimentosTramitadosParaAreaResponse"/>
+    </wsdl:operation>
+
+    <wsdl:operation name="consultarConteudoDocumento">
+      <wsdl:documentation>Consulta do conteúdo do documento</wsdl:documentation>
+      <wsdl:input message="tns:consultarConteudoDocumentoRequest"/>
+      <wsdl:output message="tns:consultarConteudoDocumentoResponse"/>
     </wsdl:operation>
 
   </wsdl:portType>
@@ -391,6 +419,16 @@
 
     <wsdl:operation name="listarProcedimentosTramitadosParaArea">
       <soap:operation soapAction="SeiComplementarAction" />
+      <wsdl:input>
+        <soap:body namespace="SeiComplementar" use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body namespace="SeiComplementar" use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+      </wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="consultarConteudoDocumento">
+      <soap:operation soapAction="SeiAction" />
       <wsdl:input>
         <soap:body namespace="SeiComplementar" use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
       </wsdl:input>

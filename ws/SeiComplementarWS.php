@@ -1,511 +1,153 @@
 <?
-/*
- * CONTROLADORIA GERAL DA UNIï¿½O - CGU
+/**
+ * Universidade Federal de Santa Catarina
  *
- * 23/06/2015 - criado por Rafael Leandro Ferreira
+ * 18/05/2023 - criado por roque.bezerra@ufsc.br
  *
- *
- *Este WebService tem o objetivo de atender a necessidade da CGU que nï¿½o estï¿½ suportada dentro dos mï¿½todos
- *existentes em SeiWS.php.
- *Foi criado este arquivo para nï¿½o fazer alteraï¿½ï¿½es neste arquivo. O ideal ï¿½ que posteriormente estes mï¿½todos sejam incorporados
- *ao SeiWS para estar disponï¿½vel como um mï¿½todo homologado pelo SEI.
  */
 
 require_once dirname(__FILE__) . '/../../../../SEI.php';
 
+ini_set('memory_limit','1024M');
+
 class SeiComplementarWS extends InfraWS {
 
-    public function getObjInfraLog(){
-        return LogSEI::getInstance();
-    }
+    public function consultarConteudoDocumento($SiglaSistema, $IdentificacaoServico, $IdUnidade, $IdDocumento, $ProtocoloDocumento){
 
-    public function listarDocumentos($SiglaSistema, $IdentificacaoServico, $IdUnidade, $ProtocoloProcedimento, $ProtocoloDocumento, $NumeroDocumento, $Serie, $UnidadeElaboradora, $DataInicial, $DataFinal, $SinRetornarAndamentoGeracao,$SinRetornarAssinaturas,$SinRetornarPublicacao, $SinRetornarDestinatarios){
+        SessaoSEI::getInstance(false);
 
-        try{
+        $objServicoDTO = $this->obterServico($SiglaSistema, $IdentificacaoServico);
 
-            InfraDebug::getInstance()->setBolLigado(false);
-            InfraDebug::getInstance()->setBolDebugInfra(false);
-            InfraDebug::getInstance()->limpar();
+        if ($IdUnidade!=null){
+            $objUnidadeDTO = $this->obterUnidade($IdUnidade,null);
+        }else{
+            $objUnidadeDTO = null;
+        }
 
-            InfraDebug::getInstance()->gravar(__METHOD__);
-            InfraDebug::getInstance()->gravar('SIGLA SISTEMA:'.$SiglaSistema);
-            InfraDebug::getInstance()->gravar('IDENTIFICACAO SERVICO:'.$IdentificacaoServico);
-            InfraDebug::getInstance()->gravar('ID UNIDADE:'.$IdUnidade);
-            InfraDebug::getInstance()->gravar('PROTOCOLO PROCEDIMENTO:'.$ProtocoloProcedimento);
-            InfraDebug::getInstance()->gravar('PROTOCOLO DOCUMENTO:'.$ProtocoloDocumento);
-            InfraDebug::getInstance()->gravar('NUMERO DOCUMENTO:'.$NumeroDocumento);
-            InfraDebug::getInstance()->gravar('SERIE:'.$Serie);
-            InfraDebug::getInstance()->gravar('UNIDADE ELABORADORA:'.$UnidadeElaboradora);
-            InfraDebug::getInstance()->gravar('DATA INICIAL:'.$DataInicial);
-            InfraDebug::getInstance()->gravar('DATA FINAL:'.$DataFinal);
-            InfraDebug::getInstance()->gravar('RETORNAR ANDAMENTO GERACAO:'.$SinRetornarAndamentoGeracao);
-            InfraDebug::getInstance()->gravar('RETORNAR ASSINATURAS:'.$SinRetornarAssinaturas);
-            InfraDebug::getInstance()->gravar('RETORNAR PUBLICACAO:'.$SinRetornarPublicacao);
-            InfraDebug::getInstance()->gravar('RETORNAR DESTINATARIOS:'.$SinRetornarDestinatarios);
+        $this->validarAcessoAutorizado(explode(',',str_replace(' ','',$objServicoDTO->getStrServidor())));
 
-            SessaoSEI::getInstance(false);
+        if ($objUnidadeDTO==null){
+            SessaoSEI::getInstance()->simularLogin(null, SessaoSEI::$UNIDADE_TESTE, $objServicoDTO->getNumIdUsuario(), null);
+        }else{
+            SessaoSEI::getInstance()->simularLogin(null, null, $objServicoDTO->getNumIdUsuario(), $objUnidadeDTO->getNumIdUnidade());
+        }
 
-            $objServicoDTO = $this->obterServico($SiglaSistema, $IdentificacaoServico);
+		try{
+			$objEntradaConsultarDocumentoAPI = new EntradaConsultarDocumentoAPI();
+            $objEntradaConsultarDocumentoAPI->setIdDocumento($IdDocumento);
+			$objEntradaConsultarDocumentoAPI->setProtocoloDocumento($ProtocoloDocumento);
+            $objEntradaConsultarDocumentoAPI->setSinRetornarAndamentoGeracao('N');
+            $objEntradaConsultarDocumentoAPI->setSinRetornarAssinaturas('N');
+            $objEntradaConsultarDocumentoAPI->setSinRetornarPublicacao('N');
+            $objEntradaConsultarDocumentoAPI->setSinRetornarCampos('N');
 
-            if ($IdUnidade!=null){
-                $objUnidadeDTO = $this->obterUnidade($IdUnidade,null);
-            }else{
-                $objUnidadeDTO = null;
+            $objSeiRN = new SeiRN();
+            $objDocumento = $objSeiRN->consultarDocumento($objEntradaConsultarDocumentoAPI);
+
+            if ($objDocumento==null){
+                throw new InfraException('Documento ['.$ProtocoloDocumento.'] não encontrado.');
             }
 
-            $this->validarAcessoAutorizado(explode(',',str_replace(' ','',$objServicoDTO->getStrServidor())));
-
-            if ($objUnidadeDTO==null){
-                SessaoSEI::getInstance()->simularLogin(null, SessaoSEI::$UNIDADE_TESTE, $objServicoDTO->getNumIdUsuario(), null);
-            }else{
-                SessaoSEI::getInstance()->simularLogin(null, null, $objServicoDTO->getNumIdUsuario(), $objUnidadeDTO->getNumIdUnidade());
-            }
+            $strConteudo = null;
 
             $objDocumentoDTO = new DocumentoDTO();
-            $objDocumentoDTO->setStrProtocoloDocumentoFormatado($ProtocoloDocumento);
-            $objDocumentoDTO->setStrProtocoloProcedimentoFormatado($ProtocoloProcedimento);
-            $objDocumentoDTO->setStrNumero($NumeroDocumento);
-            $objDocumentoDTO->setNumIdSerie($Serie);
-            $objDocumentoDTO->setNumIdUnidadeGeradoraProtocolo($UnidadeElaboradora);
+            $objDocumentoDTO->retDblIdProcedimento();
+            $objDocumentoDTO->retDblIdDocumento();
+            $objDocumentoDTO->retDblIdDocumentoEdoc();
+            $objDocumentoDTO->retStrNomeSerie();
+            $objDocumentoDTO->retStrStaDocumento();
+            $objDocumentoDTO->retStrProtocoloDocumentoFormatado();
+            $objDocumentoDTO->retStrProtocoloProcedimentoFormatado();
+            $objDocumentoDTO->setDblIdDocumento($objDocumento->getIdDocumento());
+      
+            $objDocumentoRN = new DocumentoRN();
+            $objDocumentoDTO = $objDocumentoRN->consultarRN0005($objDocumentoDTO);
 
-            $objWSEntradaListarDocumentoDTO = new WSEntradaListarDocumentoDTO();
-            $objWSEntradaListarDocumentoDTO->setObjServicoDTO($objServicoDTO);
-            $objWSEntradaListarDocumentoDTO->setObjDocumentoDTO($objDocumentoDTO);
-            $objWSEntradaListarDocumentoDTO->setObjUnidadeDTO($objUnidadeDTO);
+            $strMimeType = null;
+            $strConteudo = null;
 
-            if($DataInicial!='') {
-                $objWSEntradaListarDocumentoDTO->setDtaDataInicialGeracaoProtocolo($DataInicial);
-            }
-            else{
-                $objWSEntradaListarDocumentoDTO->setDtaDataInicialGeracaoProtocolo(null);
-            }
-
-            if($DataFinal!='') {
-                $objWSEntradaListarDocumentoDTO->setDtaDataFinalGeracaoProtocolo($DataFinal);
-            }
-            else{
-                $objWSEntradaListarDocumentoDTO->setDtaDataFinalGeracaoProtocolo(null);
-            }
-
-            if (trim($SinRetornarAndamentoGeracao)!=''){
-                $objWSEntradaListarDocumentoDTO->setStrSinRetornarAndamentoGeracao($SinRetornarAndamentoGeracao);
-            }else{
-                $objWSEntradaListarDocumentoDTO->setStrSinRetornarAndamentoGeracao('N');
-            }
-
-            if (trim($SinRetornarAssinaturas)!=''){
-                $objWSEntradaListarDocumentoDTO->setStrSinRetornarAssinaturas($SinRetornarAssinaturas);
-            }else{
-                $objWSEntradaListarDocumentoDTO->setStrSinRetornarAssinaturas('N');
-            }
-
-            if (trim($SinRetornarPublicacao)!=''){
-                $objWSEntradaListarDocumentoDTO->setStrSinRetornarPublicacao($SinRetornarPublicacao);
-            }else{
-                $objWSEntradaListarDocumentoDTO->setStrSinRetornarPublicacao('N');
-            }
-
-            if (trim($SinRetornarDestinatarios)!=''){
-                $objWSEntradaListarDocumentoDTO->setStrSinRetornarDestinatarios($SinRetornarDestinatarios);
-            }else{
-                $objWSEntradaListarDocumentoDTO->setStrSinRetornarDestinatarios('N');
-            }
-
-            $objSeiComplementarRN = new SeiComplementarRN();
-            $objWSRetornoListarDocumentoDTO = $objSeiComplementarRN->listarDocumento($objWSEntradaListarDocumentoDTO);
-
-            $i = 0;
-            $ret = array();
-            foreach($objWSRetornoListarDocumentoDTO as $retObjWSRetornoListarDocumentoDTO) {
-
-                $ret[$i]['IdProcedimento'] = $retObjWSRetornoListarDocumentoDTO->getDblIdProcedimento();
-                $ret[$i]['ProcedimentoFormatado'] = $retObjWSRetornoListarDocumentoDTO->getStrProcedimentoFormatado();
-                $ret[$i]['IdDocumento'] = $retObjWSRetornoListarDocumentoDTO->getDblIdDocumento();
-                $ret[$i]['DocumentoFormatado'] = $retObjWSRetornoListarDocumentoDTO->getStrDocumentoFormatado();
-                $ret[$i]['LinkAcesso'] = $retObjWSRetornoListarDocumentoDTO->getStrLinkAcesso();
-
-                $ret[$i]['Serie'] = (object)array('IdSerie' => $retObjWSRetornoListarDocumentoDTO->getNumIdSerie(),
-                    'Nome' => $retObjWSRetornoListarDocumentoDTO->getStrNomeSerie());
-
-                $ret[$i]['Numero'] = $retObjWSRetornoListarDocumentoDTO->getStrNumero();
-                $ret[$i]['Data'] = $retObjWSRetornoListarDocumentoDTO->getDtaGeracaoProtocolo();
-
-                $ret[$i]['UnidadeElaboradora'] = (object)array('IdUnidade' => $retObjWSRetornoListarDocumentoDTO->getNumIdUnidadeGeradora(),
-                    'Sigla' => $retObjWSRetornoListarDocumentoDTO->getStrSiglaUnidadeGeradora(),
-                    'Descricao' => $retObjWSRetornoListarDocumentoDTO->getStrDescricaoUnidadeGeradora());
-
-
-                $objAtividadeDTO = $retObjWSRetornoListarDocumentoDTO->getObjAtividadeDTOGeracao();
-                if ($objAtividadeDTO != null) {
-                    $ret[$i]['AndamentoGeracao'] = (object)array('Descricao' => $objAtividadeDTO->getStrNomeTarefa(),
-                        'DataHora' => $objAtividadeDTO->getDthAbertura(),
-                        'Unidade' => (object)array('IdUnidade' => $objAtividadeDTO->getNumIdUnidade(),
-                            'Sigla' => $objAtividadeDTO->getStrSiglaUnidade(),
-                            'Descricao' => $objAtividadeDTO->getStrDescricaoUnidade()),
-                        'Usuario' => (object)array('IdUsuario' => $objAtividadeDTO->getNumIdUsuarioOrigem(),
-                            'Sigla' => $objAtividadeDTO->getStrSiglaUsuarioOrigem(),
-                            'Nome' => $objAtividadeDTO->getStrNomeUsuarioOrigem()));
-                } else {
-                    $ret[$i]['AndamentoGeracao'] = null;
-                }
-
-
-                $arrObjAssinaturaDTO = $retObjWSRetornoListarDocumentoDTO->getArrObjAssinaturaDTO();
-                $arrAssinaturas = array();
-                foreach ($arrObjAssinaturaDTO as $objAssinaturaDTO) {
-                    $arrAssinaturas[] = (object)array('Nome' => $objAssinaturaDTO->getStrNome(),
-                        'CargoFuncao' => $objAssinaturaDTO->getStrTratamento(),
-                        'DataHora' => $objAssinaturaDTO->getDthAberturaAtividade());
-                }
-                $ret[$i]['Assinaturas'] = $arrAssinaturas;
-
-                $objPublicacaoDTO = $retObjWSRetornoListarDocumentoDTO->getObjPublicacaoDTO();
-                if ($objPublicacaoDTO != null) {
-                    $ret[$i]['Publicacao'] = (object)array('NomeVeiculo' => $objPublicacaoDTO->getStrNomeVeiculoPublicacao(),
-                        'Numero' => $objPublicacaoDTO->getNumNumero(),
-                        'DataDisponibilizacao' => $objPublicacaoDTO->getDtaDisponibilizacao(),
-                        'DataPublicacao' => $objPublicacaoDTO->getDtaPublicacao(),
-                        'Estado' => $objPublicacaoDTO->getStrStaEstado(),
-                        'ImprensaNacional' => null);
-
-                    if (!InfraString::isBolVazia($objPublicacaoDTO->getNumIdVeiculoIO())) {
-                        $ret[$i]['Publicacao']->ImprensaNacional = (object)array('SiglaVeiculo' => $objPublicacaoDTO->getStrSiglaVeiculoImprensaNacional(),
-                            'DescricaoVeiculo' => $objPublicacaoDTO->getStrDescricaoVeiculoImprensaNacional(),
-                            'Pagina' => $objPublicacaoDTO->getStrPaginaIO(),
-                            'Secao' => $objPublicacaoDTO->getStrNomeSecaoImprensaNacional(),
-                            'Data' => $objPublicacaoDTO->getDtaPublicacaoIO());
+            if ($objDocumentoDTO == null) {
+                $strConteudo = 'Documento não encontrado.';
+            } else {
+                if ($objDocumentoDTO->getStrStaDocumento() == DocumentoRN::$TD_EDITOR_EDOC) {
+                    if ($objDocumentoDTO->getDblIdDocumentoEdoc() == null) {
+                        throw new InfraException('Documento ['.$ProtocoloDocumento.'] não possui conteúdo.');
                     }
-                } else {
-                    $ret[$i]['Publicacao'] = null;
-                }
 
-                $arrObjDestinatarioDTO = $retObjWSRetornoListarDocumentoDTO->getArrObjParticipanteDTO();
-                $arrDestinatarios = array();
-                foreach ($arrObjDestinatarioDTO as $objDestinatarioDTO) {
-                    $arrDestinatarios[] = (object)array('IdContato' => $objDestinatarioDTO->getNumIdContato(),
-                        'NomeContato' => $objDestinatarioDTO->getStrNomeContato(),
-                        'EmailContato' => $objDestinatarioDTO->getStrEmailContato(),
-                        'SiglaUnidade' => $objDestinatarioDTO->getStrSiglaUnidade());
+                    $objEDocRN = new EDocRN();
+                    $dto = new DocumentoDTO();
+                    $dto->setDblIdDocumentoEdoc($objDocumentoDTO->getDblIdDocumentoEdoc());
 
-                }
-                $ret[$i]['Destinatarios'] = $arrDestinatarios;
+                    $strMimeType = 'text/html';
+                    $strConteudo = $objEDocRN->consultarHTMLDocumentoRN1204($dto);
 
-                $i++;
-            }
+                } else if ($objDocumentoDTO->getStrStaDocumento() == DocumentoRN::$TD_EDITOR_INTERNO) {
 
-            //LogSEI::getInstance()->gravar(InfraDebug::getInstance()->getStrDebug());
+                    $objEditorDTO = new EditorDTO();
+                    $objEditorDTO->setDblIdDocumento($objDocumentoDTO->getDblIdDocumento());
+                    $objEditorDTO->setNumIdBaseConhecimento(null);
+                    $objEditorDTO->setStrSinCabecalho('S');
+                    $objEditorDTO->setStrSinRodape('S');
+                    $objEditorDTO->setStrSinCarimboPublicacao('S');
+                    $objEditorDTO->setStrSinIdentificacaoVersao('N');
 
-            return $ret;
+                    $objEditorRN = new EditorRN();
 
-        }catch(Exception $e){
-            $this->processarExcecao($e);
-        }
-    }
+                    $strMimeType = 'text/html';
+                    $strConteudo = $objEditorRN->consultarHtmlVersao($objEditorDTO);
 
-    /**
-     * @param $SiglaSistema
-     * @param $IdentificacaoServico
-     * @param $IdUnidade
-     * @param $ProtocoloProcedimento
-     * @param $Interessado
-     * @param $DescricaoAssunto
-     * @param $IdTipoProcedimento
-     * @param $NomeTipoProcedimento
-     * @param $ClassificacaoAssunto
-     * @param $DataInicialRegistroProcedimento
-     * @param $DataFinalRegistroProcedimento
-     * @param $UnidadeProcedimentoAberto
-     * @return array
-     * @throws InfraException
-     * @throws SoapFault
-     */
-    public function listarProcedimentos($SiglaSistema, $IdentificacaoServico, $IdUnidade, $ProtocoloProcedimento, $Interessado, $DescricaoAssunto, $IdTipoProcedimento, $NomeTipoProcedimento, $ClassificacaoAssunto, $DataInicialRegistroProcedimento, $DataFinalRegistroProcedimento, $UnidadeProcedimentoAberto ){
+                } else if ($objDocumentoDTO->getStrStaDocumento() == DocumentoRN::$TD_FORMULARIO_AUTOMATICO || $objDocumentoDTO->getStrStaDocumento() == DocumentoRN::$TD_FORMULARIO_GERADO) {
 
-        try{
+                    $strMimeType = 'text/html';
+                    $strConteudo = $objDocumentoRN->consultarHtmlFormulario($objDocumentoDTO);
 
-            InfraDebug::getInstance()->setBolLigado(false);
-            InfraDebug::getInstance()->setBolDebugInfra(false);
-            InfraDebug::getInstance()->limpar();
+                } else if ($objDocumentoDTO->getStrStaDocumento() == DocumentoRN::$TD_EXTERNO) {
 
-            InfraDebug::getInstance()->gravar(__METHOD__);
-            InfraDebug::getInstance()->gravar('SIGLA SISTEMA:'.$SiglaSistema);
-            InfraDebug::getInstance()->gravar('IDENTIFICACAO SERVICO:'.$IdentificacaoServico);
-            InfraDebug::getInstance()->gravar('ID UNIDADE:'.$IdUnidade);
-            InfraDebug::getInstance()->gravar('PROTOCOLO PROCEDIMENTO:'.$ProtocoloProcedimento);
-            InfraDebug::getInstance()->gravar('INTERESSADO:'.$Interessado);
-            InfraDebug::getInstance()->gravar('DESCRICAO ASSUNTO:'.$DescricaoAssunto);
-            InfraDebug::getInstance()->gravar('ID TIPO PROCEDIMENTO:'.$IdTipoProcedimento);
-            InfraDebug::getInstance()->gravar('NOME TIPO PROCEDIMENTO:'.$NomeTipoProcedimento);
-            InfraDebug::getInstance()->gravar('CLASSIFICACAO ASSUNTO:'.$ClassificacaoAssunto);
-            InfraDebug::getInstance()->gravar('DATA INICIAL REGISTRO PROCEDIMENTO:'.$DataInicialRegistroProcedimento);
-            InfraDebug::getInstance()->gravar('DATA FINAL REGISTRO PROCEDIMENTO:'.$DataFinalRegistroProcedimento);
-            InfraDebug::getInstance()->gravar('UNIDADE PROCEDIMENTO ABERTO:'.$UnidadeProcedimentoAberto);
+                    $objAnexoDTO = new AnexoDTO();
+                    $objAnexoDTO->retNumIdAnexo();
+                    $objAnexoDTO->retStrNome();
+                    $objAnexoDTO->retNumIdAnexo();
+                    $objAnexoDTO->retStrHash();
+                    $objAnexoDTO->setDblIdProtocolo($objDocumentoDTO->getDblIdDocumento());
+                    $objAnexoDTO->retDblIdProtocolo();
+                    $objAnexoDTO->retDthInclusao();
+                    $objAnexoDTO->retStrProtocoloFormatadoProtocolo();
+                    
+                    $objAnexoRN = new AnexoRN();
+                    $arrObjAnexoDTO = $objAnexoRN->listarRN0218($objAnexoDTO);
 
-            SessaoSEI::getInstance(false);
+                    $objAnexoDoc = $arrObjAnexoDTO[0];
 
-            $objServicoDTO = $this->obterServico($SiglaSistema, $IdentificacaoServico);
+                    $strNomeArquivo = $objAnexoDoc->getStrNome();
+                    $strCaminhoNomeArquivo = $objAnexoRN->obterLocalizacao($objAnexoDoc);
 
-            if ($IdUnidade!=null){
-                $objUnidadeDTO = $this->obterUnidade($IdUnidade, null);
-            }else{
-                $objUnidadeDTO = null;
-            }
-
-            $this->validarAcessoAutorizado(explode(',',str_replace(' ','',$objServicoDTO->getStrServidor())));
-
-            if ($objUnidadeDTO==null){
-                SessaoSEI::getInstance()->simularLogin(null, SessaoSEI::$UNIDADE_TESTE, $objServicoDTO->getNumIdUsuario(), null);
-            }else{
-                SessaoSEI::getInstance()->simularLogin(null, null, $objServicoDTO->getNumIdUsuario(), $objUnidadeDTO->getNumIdUnidade());
-            }
-
-            $objProcedimentoDTO = new ProcedimentoDTO();
-            $objProcedimentoDTO->setStrProtocoloProcedimentoFormatado($ProtocoloProcedimento);
-
-            $objProcedimentoDTO->setStrDescricaoProtocolo($DescricaoAssunto);
-            $objProcedimentoDTO->setNumIdTipoProcedimento($IdTipoProcedimento);
-            $objProcedimentoDTO->setStrNomeTipoProcedimento($NomeTipoProcedimento);
-
-            $objWSEntradaListarProcedimentoDTO = new WSEntradaListarProcedimentoDTO();
-            $objWSEntradaListarProcedimentoDTO->setObjServicoDTO($objServicoDTO);
-            $objWSEntradaListarProcedimentoDTO->setObjProcedimentoDTO($objProcedimentoDTO);
-            $objWSEntradaListarProcedimentoDTO->setObjUnidadeDTO($objUnidadeDTO);
-
-            if($Interessado!='') {
-                $objWSEntradaListarProcedimentoDTO->setStrInteressado($Interessado);
-            }
-            else{
-                $objWSEntradaListarProcedimentoDTO->setStrInteressado(null);
-            }
-
-            if($ClassificacaoAssunto!='') {
-                $objWSEntradaListarProcedimentoDTO->setStrClassificacaoAssunto($ClassificacaoAssunto);
-            }
-            else{
-                $objWSEntradaListarProcedimentoDTO->setStrClassificacaoAssunto(null);
-            }
-
-            if($DataInicialRegistroProcedimento!='') {
-                $objWSEntradaListarProcedimentoDTO->setDtaDataInicialRegistroProcedimento($DataInicialRegistroProcedimento);
-            }
-            else{
-                $objWSEntradaListarProcedimentoDTO->setDtaDataInicialRegistroProcedimento(null);
-            }
-
-            if($DataFinalRegistroProcedimento!='') {
-                $objWSEntradaListarProcedimentoDTO->setDtaDataFinalRegistroProcedimento($DataFinalRegistroProcedimento);
-            }
-            else{
-                $objWSEntradaListarProcedimentoDTO->setDtaDataFinalRegistroProcedimento(null);
-            }
-
-            if($UnidadeProcedimentoAberto!='') {
-                $objUnidadeProcedimentoAberto = $this->obterUnidade(null,$UnidadeProcedimentoAberto);
-                $objWSEntradaListarProcedimentoDTO->setNumUnidadeProcedimentoAberto($objUnidadeProcedimentoAberto->getNumIdUnidade());
-            }
-            else{
-                $objWSEntradaListarProcedimentoDTO->setNumUnidadeProcedimentoAberto(null);
-            }
-
-            $objSeiComplementarRN = new SeiComplementarRN();
-            $objWSRetornoListarProcedimentoDTO = $objSeiComplementarRN->listarProcedimento($objWSEntradaListarProcedimentoDTO);
-
-            $ret = array();
-            $i = 0;
-
-            foreach($objWSRetornoListarProcedimentoDTO as $retObjWSRetornoListarProcedimentoDTO) {
-
-                $ret[$i]['IdProcedimento'] = $retObjWSRetornoListarProcedimentoDTO->getDblIdProcedimento();
-                $ret[$i]['ProcedimentoFormatado'] = $retObjWSRetornoListarProcedimentoDTO->getStrProcedimentoFormatado();
-
-                $ret[$i]['TipoProcedimento'] = (object)array('IdTipoProcedimento' => $retObjWSRetornoListarProcedimentoDTO->getNumIdTipoProcedimento(),
-                    'Nome' => $retObjWSRetornoListarProcedimentoDTO->getStrNomeTipoProcedimento());
-
-                //LogSEI::getInstance()->gravar(InfraDebug::getInstance()->getStrDebug());
-                $i++;
-            }
-            return $ret;
-
-        }catch(Exception $e){
-            $this->processarExcecao($e);
-        }
-    }
-
-    /**
-     * @param $SiglaSistema
-     * @param $IdentificacaoServico
-     * @param $IdUnidade
-     * @param $ProtocoloProcedimento
-     * @return array
-     * @throws InfraException
-     * @throws SoapFault
-     */
-    public function listarAndamentos($SiglaSistema, $IdentificacaoServico, $IdUnidade, $ProtocoloProcedimento )
-    {
-
-        try {
-
-            InfraDebug::getInstance()->setBolLigado(false);
-            InfraDebug::getInstance()->setBolDebugInfra(false);
-            InfraDebug::getInstance()->limpar();
-
-            InfraDebug::getInstance()->gravar(__METHOD__);
-            InfraDebug::getInstance()->gravar('SIGLA SISTEMA:' . $SiglaSistema);
-            InfraDebug::getInstance()->gravar('IDENTIFICACAO SERVICO:' . $IdentificacaoServico);
-            InfraDebug::getInstance()->gravar('ID UNIDADE:' . $IdUnidade);
-            InfraDebug::getInstance()->gravar('PROTOCOLO PROCEDIMENTO:' . $ProtocoloProcedimento);
-
-            SessaoSEI::getInstance(false);
-
-            $objServicoDTO = $this->obterServico($SiglaSistema, $IdentificacaoServico);
-
-            if ($IdUnidade != null) {
-                $objUnidadeDTO = $this->obterUnidade($IdUnidade, null);
-            } else {
-                $objUnidadeDTO = null;
-            }
-
-            $this->validarAcessoAutorizado(explode(',', str_replace(' ', '', $objServicoDTO->getStrServidor())));
-
-            if ($objUnidadeDTO == null) {
-                SessaoSEI::getInstance()->simularLogin(null, SessaoSEI::$UNIDADE_TESTE, $objServicoDTO->getNumIdUsuario(), null);
-            } else {
-                SessaoSEI::getInstance()->simularLogin(null, null, $objServicoDTO->getNumIdUsuario(), $objUnidadeDTO->getNumIdUnidade());
-            }
-
-            $objProcedimentoDTO = new ProcedimentoDTO();
-            $objProcedimentoDTO->setStrProtocoloProcedimentoFormatado($ProtocoloProcedimento);
-
-            $objWSEntradaListarAndamentosDTO = new WSEntradaListarAndamentosDTO();
-            $objWSEntradaListarAndamentosDTO->setObjServicoDTO($objServicoDTO);
-            $objWSEntradaListarAndamentosDTO->setObjProcedimentoDTO($objProcedimentoDTO);
-            $objWSEntradaListarAndamentosDTO->setObjUnidadeDTO($objUnidadeDTO);
-
-            $objSeiComplementarRN = new SeiComplementarRN();
-            $objWSRetornoListarAndamentosDTO = $objSeiComplementarRN->listarAndamentos($objWSEntradaListarAndamentosDTO);
-
-            $ret = array();
-            $i = 0;
-
-            /*?> <pre> <? echo var_dump($objWSRetornoListarAndamentosDTO);?> </pre> <?*/
-
-            $ret['IdProcedimento'] = $objWSRetornoListarAndamentosDTO->getDblIdProcedimento();
-            $ret['ProcedimentoFormatado'] = $objWSRetornoListarAndamentosDTO->getStrProcedimentoFormatado();
-
-            $ret['TipoProcedimento'] = (object) array('IdTipoProcedimento' => $objWSRetornoListarAndamentosDTO->getNumIdTipoProcedimento(),
-                'Nome' => $objWSRetornoListarAndamentosDTO->getStrNomeTipoProcedimento());
-
-            $arrObjAtividadeDTO = $objWSRetornoListarAndamentosDTO->getArrObjAtividadeDTO();
-            $arrAtividades = array();
-
-            foreach ($arrObjAtividadeDTO as $objAtividadeDTO) {
-
-                $arrAtividades[] = (object)array('Descricao' => $objAtividadeDTO->getStrNomeTarefa(),
-                    'DataHora' => $objAtividadeDTO->getDthAbertura(),
-                    'Unidade' => (object)array('IdUnidade'=> $objAtividadeDTO->getNumIdUnidade(),
-                        'Sigla' => $objAtividadeDTO->getStrSiglaUnidade(),
-                        'Descricao' => $objAtividadeDTO->getStrDescricaoUnidade()),
-                    'Usuario' => (object)array('IdUsuario'=> $objAtividadeDTO->getNumIdUsuarioOrigem(),
-                        'Sigla' => $objAtividadeDTO->getStrSiglaUsuarioOrigem(),
-                        'Nome' => $objAtividadeDTO->getStrNomeUsuarioOrigem()));
-
-                //LogSEI::getInstance()->gravar(InfraDebug::getInstance()->getStrDebug());
-                $i++;
-            }
-            $ret['Andamentos'] = $arrAtividades;
-
-            return $ret;
-
-
-         }catch(Exception $e){
-            $this->processarExcecao($e);
-         }
-    }
-
-    /**
-     * @param $SiglaSistema
-     * @param $IdentificacaoServico
-     * @param $IdUnidade
-     * @param $ProtocoloProcedimento
-     * @return array
-     * @throws InfraException
-     * @throws SoapFault
-     */
-    public function listarProcedimentosTramitadosParaArea($SiglaSistema, $IdentificacaoServico, $IdUnidade, $arrRequisicaoConsultaTramite, $idUnidadePesquisa )
-    {
-
-        try {
-
-            InfraDebug::getInstance()->setBolLigado(false);
-            InfraDebug::getInstance()->setBolDebugInfra(false);
-            InfraDebug::getInstance()->limpar();
-
-            InfraDebug::getInstance()->gravar(__METHOD__);
-            InfraDebug::getInstance()->gravar('SIGLA SISTEMA:' . $SiglaSistema);
-            InfraDebug::getInstance()->gravar('IDENTIFICACAO SERVICO:' . $IdentificacaoServico);
-            InfraDebug::getInstance()->gravar('ID UNIDADE:' . $IdUnidade);
-
-            SessaoSEI::getInstance(false);
-
-            $objServicoDTO = $this->obterServico($SiglaSistema, $IdentificacaoServico);
-
-            if ($IdUnidade != null) {
-                $objUnidadeDTO = $this->obterUnidade($IdUnidade, null);
-            } else {
-                $objUnidadeDTO = null;
-            }
-
-            $this->validarAcessoAutorizado(explode(',', str_replace(' ', '', $objServicoDTO->getStrServidor())));
-
-            if ($objUnidadeDTO == null) {
-                SessaoSEI::getInstance()->simularLogin(null, SessaoSEI::$UNIDADE_TESTE, $objServicoDTO->getNumIdUsuario(), null);
-            } else {
-                SessaoSEI::getInstance()->simularLogin(null, null, $objServicoDTO->getNumIdUsuario(), $objUnidadeDTO->getNumIdUnidade());
-            }
-
-            $arrProtocolos = array();
-            $ret = array();
-
-            $i = 0;
-
-            foreach($arrRequisicaoConsultaTramite as $requisicaoConsultaTramite){
-
-                $idProcedimento = $requisicaoConsultaTramite->IdProcedimento;
-                $dataAbertura = strtotime($requisicaoConsultaTramite->DataAbertura);
-                //$idProcedimento = $requisicaoConsultaTramite['IdProcedimento'];
-                //$dataAbertura = strtotime($requisicaoConsultaTramite['DataAbertura']);
-
-                $objWSEntradaListarProcedimentosTramitadosDTO = new WSEntradaListarProcedimentosTramitadosDTO();
-                $objWSEntradaListarProcedimentosTramitadosDTO->setDblIdProcedimento($idProcedimento);
-                $objWSEntradaListarProcedimentosTramitadosDTO->setDthDataReferencia($dataAbertura);
-                $objWSEntradaListarProcedimentosTramitadosDTO->setNumIdUnidadePesquisa($idUnidadePesquisa);
-
-                $objSeiComplementarRN = new SeiComplementarRN();
-                $objWSRetornoListarAndamentosDTO = $objSeiComplementarRN->listarProcedimentosTramitadosParaArea($objWSEntradaListarProcedimentosTramitadosDTO);
-
-                $arrObjAtividadeDTO = $objWSRetornoListarAndamentosDTO->getArrObjAtividadeDTO();
-
-                //echo "<br><br>Procedimento" . $idProcedimento . "<br>";
-                //var_dump($arrObjAtividadeDTO);
-
-                foreach ($arrObjAtividadeDTO as $objAtividadeDTO) {
-                    if($objAtividadeDTO->getDthAbertura() >= $dataAbertura){
-                        if($objAtividadeDTO->getNumIdUnidade() == $idUnidadePesquisa){
-                            $ret[$i]['IdProtocolo'] = $idProcedimento;
-                            //$arrProtocolos[] = (object)array('IdProtocolo'=>$requisicaoConsultaTramite->IdProcedimentoPesquisa);
-                        }
+                    $binConteudo = file_get_contents($strCaminhoNomeArquivo);
+        
+                    if (md5($binConteudo) != $objAnexoDoc->getStrHash()) {
+                      throw new InfraException('Conteúdo do arquivo corrompido.', null, $strCaminhoNomeArquivo);
                     }
+                    
+                    $strMimeType = InfraUtil::getStrMimeType($strNomeArquivo);
+                    $strConteudo = base64_encode($binConteudo);
                 }
-                $i++;
             }
-            //$ret['IdProtocolo'] = $arrProtocolos;
 
-            return $ret;
+            $objRetorno = new SaidaConsultarConteudoDocumentoDTO();
+            $objRetorno->setIdProcedimento($objDocumentoDTO->getDblIdProcedimento());
+            $objRetorno->setIdDocumento($objDocumentoDTO->getDblIdDocumento());
 
-        }catch(Exception $e){
+            $objRetorno->setProcedimentoFormatado($objDocumentoDTO->getStrProtocoloProcedimentoFormatado());
+            $objRetorno->setDocumentoFormatado($objDocumentoDTO->getStrProtocoloDocumentoFormatado());
+            $objRetorno->setMimeType($strMimeType);
+            $objRetorno->setConteudo($strConteudo);
+
+            return $objRetorno;
+
+		}catch(Exception $e){
             $this->processarExcecao($e);
-        }
+		}
     }
+
 
     private function obterServico($SiglaSistema, $IdentificacaoServico){
 
@@ -518,7 +160,7 @@ class SeiComplementarWS extends InfraWS {
         $objUsuarioDTO = $objUsuarioRN->consultarRN0489($objUsuarioDTO);
 
         if ($objUsuarioDTO==null){
-            throw new InfraException('Sistema ['.$SiglaSistema.'] nï¿½o encontrado.');
+            throw new InfraException('Sistema ['.$SiglaSistema.'] n?o encontrado.');
         }
 
         $objServicoDTO = new ServicoDTO();
@@ -536,7 +178,7 @@ class SeiComplementarWS extends InfraWS {
         $objServicoDTO = $objServicoRN->consultar($objServicoDTO);
 
         if ($objServicoDTO==null){
-            throw new InfraException('Serviï¿½o ['.$IdentificacaoServico.'] do sistema ['.$SiglaSistema.'] nï¿½o encontrado.');
+            throw new InfraException('Servi?o ['.$IdentificacaoServico.'] do sistema ['.$SiglaSistema.'] n?o encontrado.');
         }
 
         return $objServicoDTO;
@@ -560,7 +202,7 @@ class SeiComplementarWS extends InfraWS {
         $objUnidadeDTO = $objUnidadeRN->consultarRN0125($objUnidadeDTO);
 
         if ($objUnidadeDTO==null){
-            throw new InfraException('Unidade ['.$IdUnidade.'] nï¿½o encontrada.');
+            throw new InfraException('Unidade ['.$IdUnidade.'] n?o encontrada.');
         }
 
         return $objUnidadeDTO;
@@ -571,7 +213,7 @@ class SeiComplementarWS extends InfraWS {
  $servidorSoap = new SoapServer("sei.wsdl",array('encoding'=>'ISO-8859-1'));
  $servidorSoap->setClass("SeiWS");
 
- //Sï¿½ processa se acessado via POST
+ //S? processa se acessado via POST
  if ($_SERVER['REQUEST_METHOD']=='POST') {
  $servidorSoap->handle();
  }
@@ -582,8 +224,7 @@ $servidorSoap = new BeSimple\SoapServer\SoapServer( "sei-complementar.wsdl", arr
     'attachment_type'=>BeSimple\SoapCommon\Helper::ATTACHMENTS_TYPE_MTOM));
 $servidorSoap->setClass ( "SeiComplementarWS" );
 
-//Sï¿½ processa se acessado via POST
+//S? processa se acessado via POST
 if ($_SERVER['REQUEST_METHOD']=='POST') {
     $servidorSoap->handle($HTTP_RAW_POST_DATA);
 }
-?>
