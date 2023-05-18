@@ -2,6 +2,7 @@ image: alpine:latest
 
 stages:
   - package
+  - publish
 
 package:
   stage: package
@@ -17,3 +18,8 @@ package:
     paths:
       - "*.tar.gz"
       - "*.tgz"
+
+publish:
+  stage: publish
+  script:
+    - 'curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file ufsc-sei-complementar.tar.gz "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/ufsc-sei-complementar/1.0.0/ufsc-sei-complementar.tar.gz"'
