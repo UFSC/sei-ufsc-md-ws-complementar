@@ -1,7 +1,7 @@
 # Módulo de WebService Complementar
 
 - Neste projeto desenvolvemos alguns métodos de WebServices para suprir a necessidade de: 
-  listarProcedimentos, listarDocumentos, listarAndamentos, listarProcessosTramitadosParaArea uma vez que o WebService nativo do SEI não possui esses serviços. 
+  consultarConteudoDocumento uma vez que o WebService nativo do SEI não possui esse serviço. 
   
 ## Requisitos:
 - SEI 3.0.0 instalado ou atualizado (verificar valor da constante de versão do SEI no arquivo /sei/web/SEI.php).
@@ -14,8 +14,6 @@
 			'URL' => 'http://[Servidor_PHP]/sei',
 			'Producao' => false,
 			'RepositorioArquivos' => '/var/sei/arquivos',
-			'Modulos' => array('MdSeiComplementarWsComplementarIntegracao' => 'ufsc/md-ws-complementar',)
+			'Modulos' => array('MdSeiWsComplementarIntegracao' => 'ufsc/wscomplementar',)
 			),
 
-## Documentação
-- Para conhecer um pouco mais sobre os serviços deste webservice acesse o documento ManualWebServiceCgu.pdf
