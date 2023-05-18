@@ -1,11 +1,10 @@
-image: alpine:latest
-
 stages:
   - package
   - publish
 
 package:
   stage: package
+  image: alpine:latest
   script:
     - mkdir -p dist/ufsc
     - cp *.php dist/ufsc/
@@ -21,5 +20,6 @@ package:
 
 publish:
   stage: publish
+  image: curlimages/curl:latest
   script:
     - 'curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file ufsc-sei-complementar.tar.gz "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/ufsc-sei-complementar/1.0.0/ufsc-sei-complementar.tar.gz"'
