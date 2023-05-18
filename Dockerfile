@@ -7,5 +7,4 @@ RUN sed  -i "/'RepositorioArquivos'/a ,'Modulos' => array('MdSeiWsComplementarIn
 
 COPY *.php /opt/sei/web/modulos/ufsc/wscomplementar
 COPY dto /opt/sei/web/modulos/ufsc/wscomplementar/dto
-COPY rn /opt/sei/web/modulos/ufsc/wscomplementar/rn
 COPY ws /opt/sei/web/modulos/ufsc/wscomplementar/ws
