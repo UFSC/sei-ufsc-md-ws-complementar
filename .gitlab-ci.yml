@@ -8,8 +8,8 @@ package:
   script:
     - mkdir -p dist/ufsc
     - cp *.php dist/ufsc/
-    - cp dto dist/ufsc/
-    - cp ws dist/ufsc/
+    - cp -R dto dist/ufsc/
+    - cp -R ws dist/ufsc/
     - cd dist
     - tar cvfz ufsc-sei-complementar.tar.gz .
     - mv ufsc-sei-complementar.tar.gz ../
