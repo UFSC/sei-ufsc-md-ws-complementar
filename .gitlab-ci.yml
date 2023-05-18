@@ -1,0 +1,19 @@
+image: alpine:latest
+
+stages:
+  - package
+
+package:
+  stage: package
+  script:
+    - mkdir -p dist/ufsc
+    - cp *.php dist/ufsc/
+    - cp dto dist/ufsc/
+    - cp ws dist/ufsc/
+    - cd dist
+    - tar cvfz ufsc-sei-complementar.tar.gz .
+    - mv ufsc-sei-complementar.tar.gz ../
+  artifacts:
+    paths:
+      - "*.tar.gz"
+      - "*.tgz"
