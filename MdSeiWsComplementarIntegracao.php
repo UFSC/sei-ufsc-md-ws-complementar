@@ -15,7 +15,7 @@ class MdSeiWsComplementarIntegracao extends SeiIntegracao
 
     public function getNome()
     {
-        return 'Módulo de Webservice Complementar para integraç?o com o SEI';
+        return 'Módulo de Webservice Complementar para integração com o SEI';
     }
 
     public function getVersao()
